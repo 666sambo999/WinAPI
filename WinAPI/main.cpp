@@ -1,6 +1,8 @@
 #include <Windows.h>
 #include "resource.h"
 
+CONST CHAR g_sz_INVITE[] = "Введите имя пользователя";
+
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 //HWND -  окно(Handler to Windows - обработчик окна)
 // uMsg - сooбщение которое передается окну 
@@ -33,12 +35,31 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		HICON hIcon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ICON1));
 		SendMessage(hwnd, WM_SETICON, 0, (LPARAM)hIcon);
 		HWND hEditLogin = GetDlgItem(hwnd, IDC_EDIT_LOGIN);
-		SetFocus(hEditLogin); // выделяем окно для печати 
+		//SetFocus(hEditLogin); // выделяем окно для печати, это часть окна которая принимает команды с клавиатуры    
+		SendMessage(hEditLogin, WM_SETTEXT, 0, (LPARAM)g_sz_INVITE);
 	}
 	break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
+		case IDC_EDIT_LOGIN:
+		{
+			CONST INT SIZE = 256; // считываем текст в буфер, потом сравниваем с пустой строкой
+			CHAR sz_buffer[SIZE] = {};
+			SendMessage(GetDlgItem(hwnd, IDC_EDIT_LOGIN), WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
+			if (HIWORD(wParam)== EN_SETFOCUS) // WORD -2 байта памяти, DWORD - это double word ( 4 байта памяти)
+			// которое делется на HIWORD(старшее) and LOWORD(младшее) 
+				if (strcmp (sz_buffer, g_sz_INVITE) == 0)SendMessage(GetDlgItem(hwnd, IDC_EDIT_LOGIN), WM_SETTEXT, 0, (LPARAM)"");
+			if (HIWORD(wParam) == EN_KILLFOCUS)
+			{
+				//SendMessage(GetDlgItem(hwnd, IDC_EDIT_LOGIN), WM_SETTEXT, 0, (LPARAM)g_sz_INVITE);
+				if (strcmp(sz_buffer, "") == 0)
+				{
+					SendMessage(GetDlgItem(hwnd, IDC_EDIT_LOGIN), WM_SETTEXT, 0, (LPARAM)g_sz_INVITE);
+				}
+			}
+		}
+			break;
 		case IDC_BUTTON_COPY: 
 		{
 			CONST INT SIZE = 256;
