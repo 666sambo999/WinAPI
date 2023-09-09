@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <cstdio>
 #include"resource.h"
+#include"resource1.h"
 
 CONST CHAR* g_sz_VALUES[] = { "This", "is", "my", "first", "Combo", "Box" };
 
@@ -81,9 +82,9 @@ BOOL CALLBACK DlgProcAddElement(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 			SendMessage(hEdit, WM_GETTEXT, SIZE, (LPARAM)sz_byffer);
 			HWND hParent = GetParent(hwnd);
 			HWND hCombo = GetDlgItem(hParent, IDC_COMBO1);
-			SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)sz_byffer);
+			if(SendMessage(hCombo, CB_FINDSTRING, 0, (LPARAM)sz_byffer) == CB_ERR)
+				SendMessage(hCombo, CB_ADDSTRING, 0, (LPARAM)sz_byffer);
 		}
-		break;
 		case IDCANCEL:EndDialog(hwnd, 0);
 		}
 		break;

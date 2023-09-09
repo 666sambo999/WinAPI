@@ -5,6 +5,7 @@
 #define IDD_DIALOG1                     101
 #define IDC_COMBO1                      1001
 
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
