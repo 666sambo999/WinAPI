@@ -28,23 +28,9 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, IN
 											// т.е любое окна к какому то типа(Кнопка, Текстовое поле)
 	if (!RegisterClassEx(&wc))
 	{
-		//MessageBox(NULL, "Что-то пошло не так", "Error", MB_OK | MB_ICONERROR);
-		LPSTR lpszMessageBuffer = NULL;
-		DWORD dwSize =
-			FormatMessage
-			(
-				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL,
-				dwErrorMessageID,
-				MAKELANGID(LANG_NEUTRAL, SUBLANG_RUSSIAN_RUSSIA),
-				(LPSTR)&lpszMessageBuffer,
-				0,
-				NULL
-			);
-			MessageBox(NULL, lpszMessageBuffer, "Error", MB_OK | MB_ICONERROR);
-			LocalFree(lpszMessageBuffer);
-			//MessageBox(NULL, "Something went wrong", "Error", MB_OK | MB_ICONERROR);
-			return 0; 
+		MessageBox(NULL, "Что-то пошло не так", "Error", MB_OK | MB_ICONERROR);
+		//MessageBox(NULL, "Something went wrong", "Error", MB_OK | MB_ICONERROR);
+		return 0; 
 	}
 	
 	//2) Создание окна
@@ -64,9 +50,26 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, IN
 		NULL
 	);
 
+	DWORD dwErrorMessageID = GetLastError();
+
 	if (hwnd == NULL)
 	{
 		MessageBox(NULL, "Окно не открывается, поэтому откроем хотя бы форточку", "Полезная информация", MB_OK | MB_ICONINFORMATION);
+		
+		LPSTR lpszMessageBuffer = NULL;
+		DWORD dwSize =
+			FormatMessage
+			(
+				FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+				NULL,
+				dwErrorMessageID,
+				MAKELANGID(LANG_NEUTRAL, SUBLANG_RUSSIAN_RUSSIA),
+				(LPSTR)&lpszMessageBuffer,
+				0,
+				NULL
+			);
+		MessageBox(NULL, lpszMessageBuffer, "Error", MB_OK | MB_ICONERROR);
+		LocalFree(lpszMessageBuffer);
 		return 0; 
 	}
 
