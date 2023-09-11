@@ -3,7 +3,7 @@
 #include<cstdio>
 #include"resource.h"
 
-CONST CHAR* g_sz_VALUES[] = { "This", "is", "my", "first", "List", "Box" };
+CONST CHAR* g_sz_VALUES[] = { "This", "is", "my", "first", "List", "Box"};
 
 BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL CALLBACK DlgProcAddElement(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -47,6 +47,7 @@ BOOL CALLBACK DlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			else
 			{
 				CHAR sz_message[SIZE] = {};
+				i++;
 				sprintf(sz_message, "Был выбран № %i, со значением \"%s\"", i, sz_buffer);
 				MessageBox(hwnd, sz_message, "Info", MB_OK | MB_ICONINFORMATION);
 			}

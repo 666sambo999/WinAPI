@@ -1,6 +1,6 @@
 #include<Windows.h>
 #include<stdio.h>
-//#include"resource.h"
+#include "resource.h"
 
 CONST CHAR g_sz_WINDOWS_CLASS[] = "My Windows Class";
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMng, WPARAM wParam, LPARAM lParam);
@@ -16,9 +16,13 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, IN
 	wc.cbWndExtra = 0;
 	wc.style = 0;
 
-	wc.hIcon = LoadIcon(hInstance, IDI_APPLICATION);	// Иконка в панеле задач 
-	wc.hIconSm = LoadIcon(hInstance, IDI_APPLICATION);	// Икона отображаемая в строке заголовка 
-	wc.hCursor = LoadCursor(hInstance, IDC_ARROW);		// указатель мыши, при наведении окна, курсор 
+	//wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_CONSOLE));	// Иконка в панеле задач 
+	//wc.hIconSm = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON_STAR));	// Икона отображаемая в строке заголовка 
+	wc.hIconSm = (HICON)LoadImage(hInstance, "starbucks.ico", IMAGE_ICON, LR_DEFAULTSIZE,LR_DEFAULTSIZE, LR_LOADFROMFILE);
+	wc.hIcon = (HICON)LoadImage(hInstance, "console_gamer.ico", IMAGE_ICON, LR_DEFAULTSIZE,LR_DEFAULTSIZE, LR_LOADFROMFILE);
+	
+	//wc.hCursor = LoadCursor(hInstance, MAKEINTRESOURCE(IDC_CURSOR1));		// указатель мыши, при наведении окна, курсор 
+	wc.hCursor = (HCURSOR)LoadImage(hInstance, "Darth", IMAGE_CURSOR, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);		// цвет и фон окна 
 
 	wc.hInstance = hInstance;				// экземпляр запущенной программы 
@@ -41,7 +45,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, IN
 		g_sz_WINDOWS_CLASS,		// Заголовок окна 
 		WS_OVERLAPPEDWINDOW,	// Главное окно программы, еще назыв TopLevelWindows
 		CW_USEDEFAULT, CW_USEDEFAULT, // координаты 
-		CW_USEDEFAULT, CW_USEDEFAULT,
+		CW_USEDEFAULT, CW_USEDEFAULT, // размеер окна 
 		NULL,						// Parent - родителькое окно 
 		NULL,						// имя меню, для главного окна 
 									// для элемента окна - ID ресурса, этого элемента (IDC_EDIT, IDC_BUTTON)
@@ -77,10 +81,17 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, IN
 	UpdateWindow(hwnd);			// Выполняет прорисовку окна
 	
 	//3) Запуск цикла сообщений 
+	MSG msg;
+	while (GetMessage(&msg, 0, 0, 0) > 0)
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 	return 0; 
 
 }
 
+// Процедура окна 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMng, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMng)
@@ -89,9 +100,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMng, WPARAM wParam, LPARAM lParam)
 		break;
 	case WM_COMMAND:
 		break;
-	case WM_DESTROY: PostQuitMessage(0); break;
-	case WM_CLOSE: DestroyWindow(hwnd);	break;
-	default:  DefWindowProc(hwnd, uMng, wParam, lParam);
+	case WM_DESTROY:	PostQuitMessage(0); break;
+	case WM_CLOSE:		DestroyWindow(hwnd);	break;
+	default:			return DefWindowProc(hwnd, uMng, wParam, lParam);
 	}
 	return FALSE;
 }
