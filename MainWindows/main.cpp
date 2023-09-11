@@ -45,7 +45,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, IN
 		g_sz_WINDOWS_CLASS,		// Заголовок окна 
 		WS_OVERLAPPEDWINDOW,	// Главное окно программы, еще назыв TopLevelWindows
 		CW_USEDEFAULT, CW_USEDEFAULT, // координаты 
-		CW_USEDEFAULT, CW_USEDEFAULT, // размеер окна 
+		CW_USEDEFAULT, CW_USEDEFAULT, // размер окна 
 		NULL,						// Parent - родителькое окно 
 		NULL,						// имя меню, для главного окна 
 									// для элемента окна - ID ресурса, этого элемента (IDC_EDIT, IDC_BUTTON)
@@ -97,8 +97,59 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMng, WPARAM wParam, LPARAM lParam)
 	switch (uMng)
 	{
 	case WM_CREATE:
-		break;
+	{
+		CHAR sz_static_text[] = "Этот static control создан при помощи функции CreateWindowsEx()  :)";
+		CreateWindowEx
+		(
+			0,
+			"Static", sz_static_text,
+			WS_CHILD | WS_VISIBLE,
+			100, 100,
+			strlen(sz_static_text)*7.3,20,
+			hwnd,
+			(HMENU)IDC_STATIC,
+			GetModuleHandle(0),
+			NULL
+		);
+		CreateWindowEx // создание кнопки 
+		(
+			0,
+			"Button", "Ok",
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			600,400,
+			40,20,
+			hwnd, 
+			(HMENU)IDC_BUTTON,
+			GetModuleHandle(0),
+			NULL
+		);
+		CreateWindowEx // создание поля для ввода 
+		(
+			0, "Edit", "введите текст сообщения:",
+			WS_CHILD | WS_VISIBLE | WS_BORDER,
+			350,250,
+			300,25,
+			hwnd,
+			(HMENU)IDC_EDIT_CONTROL,
+			GetModuleHandle(0),
+			NULL
+		);
+	
+	}
+	
+	break;
 	case WM_COMMAND:
+		switch LOWORD(wParam)
+		{
+		case IDC_BUTTON:
+		{
+			CONST INT SIZE = 256;
+			CHAR sz_byffer[SIZE] = {};
+			SendMessage(GetDlgItem(hwnd, IDC_EDIT_CONTROL), WM_GETTEXT, SIZE, (LPARAM)sz_byffer);
+			SendMessage(GetDlgItem(hwnd, IDC_STATIC), WM_SETTEXT, 0, (LPARAM)sz_byffer);
+		}
+		break;
+		}
 		break;
 	case WM_DESTROY:	PostQuitMessage(0); break;
 	case WM_CLOSE:		DestroyWindow(hwnd);	break;
