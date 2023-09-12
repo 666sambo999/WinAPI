@@ -1,6 +1,8 @@
+#define _CRT_SECURE_NO_WARNINGS 
 #include<Windows.h>
 #include<stdio.h>
 #include "resource.h"
+#include<stdio.h>
 
 CONST CHAR g_sz_WINDOWS_CLASS[] = "My Windows Class";
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMng, WPARAM wParam, LPARAM lParam);
@@ -36,7 +38,14 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, IN
 		//MessageBox(NULL, "Something went wrong", "Error", MB_OK | MB_ICONERROR);
 		return 0; 
 	}
-	
+	// Создание окна 
+	int screen_width = GetSystemMetrics(SM_CXSCREEN);
+	int screen_height = GetSystemMetrics(SM_CYSCREEN);
+	int window_width = screen_width * .75;  // размер окна по центру экрана 
+	int window_height = screen_height * .75;
+	int start_x = screen_width * .125; // положение окна на экране, 75%
+	int start_y = screen_height * .125;
+
 	//2) Создание окна
 	HWND hwnd = CreateWindowExA
 	(
@@ -44,8 +53,11 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, IN
 		g_sz_WINDOWS_CLASS,		// Имя класса окна 
 		g_sz_WINDOWS_CLASS,		// Заголовок окна 
 		WS_OVERLAPPEDWINDOW,	// Главное окно программы, еще назыв TopLevelWindows
-		CW_USEDEFAULT, CW_USEDEFAULT, // координаты 
-		CW_USEDEFAULT, CW_USEDEFAULT, // размер окна 
+
+		start_x,start_y,
+		window_width,window_height,
+		//CW_USEDEFAULT, CW_USEDEFAULT, // координаты на экране 
+		//CW_USEDEFAULT, CW_USEDEFAULT, // размер окна 
 		NULL,						// Parent - родителькое окно 
 		NULL,						// имя меню, для главного окна 
 									// для элемента окна - ID ресурса, этого элемента (IDC_EDIT, IDC_BUTTON)
@@ -53,7 +65,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, IN
 							// то его всегда можно получить при помощи функции GetModulHandle(NULL)
 		NULL
 	);
-
+	
 	DWORD dwErrorMessageID = GetLastError();
 
 	if (hwnd == NULL)
@@ -90,6 +102,7 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR IpCmdLine, IN
 	return 0; 
 
 }
+
 
 // Процедура окна 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMng, WPARAM wParam, LPARAM lParam)
@@ -134,10 +147,21 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMng, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(0),
 			NULL
 		);
-	
 	}
-	
 	break;
+	case WM_SIZE:
+	case WM_MOVE:
+	{
+		RECT rect; 
+		GetWindowRect(hwnd, &rect);
+		int widht = rect.right - rect.left;
+		int height = rect.bottom - rect.top;
+		CONST INT SIZE = 256;
+		CHAR sz_buffer[SIZE] = {};
+		sprintf(sz_buffer, "%s, Position: %i,%i, Size: %i,%i", g_sz_WINDOWS_CLASS, rect.left, rect.top, widht, height);
+		SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)sz_buffer); // отправляем сообщение в окно
+	}
+	break; 
 	case WM_COMMAND:
 		switch LOWORD(wParam)
 		{
