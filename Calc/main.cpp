@@ -1,3 +1,4 @@
+ï»¿#define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
 #include"resource.h"
 #include"resource1.h"
@@ -29,7 +30,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 INT WINAPI  WinMain(HINSTANCE hInstante, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
-	//1) Ðåãèñòðàöèÿ êëàññà îêíà 
+	//1) Ð ÐµÐ³Ð¸ÑÑ‚Ñ€Ð°Ñ†Ð¸Ñ ÐºÐ»Ð°ÑÑÐ° Ð¾ÐºÐ½Ð° 
 	WNDCLASSEX wc;
 	ZeroMemory(&wc, sizeof(wc));
 	
@@ -53,7 +54,7 @@ INT WINAPI  WinMain(HINSTANCE hInstante, HINSTANCE hPrevInst, LPSTR lpCmdLine, I
 		MessageBox(NULL, "Class registration failed", "Error", MB_OK | MB_ICONERROR);
 		return 0;
 	}
-	//2) Ñîçäàíèå îêíà 
+	//2) Ð¡Ð¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð¾ÐºÐ½Ð° 
 	HWND hwnd = CreateWindowEx
 	(
 		NULL,
@@ -74,7 +75,7 @@ INT WINAPI  WinMain(HINSTANCE hInstante, HINSTANCE hPrevInst, LPSTR lpCmdLine, I
 	}
 	ShowWindow(hwnd, nCmdShow);
 	UpdateWindow(hwnd);
-	//3) Çàïóñê öèêëà ñîîáùåíèé  
+	//3) Ð—Ð°Ð¿ÑƒÑÐº Ñ†Ð¸ÐºÐ»Ð° ÑÐ¾Ð¾Ð±Ñ‰ÐµÐ½Ð¸Ð¹  
 	MSG msg;
 	while (GetMessage(&msg, 0, 0, 0) > 0)
 	{
@@ -87,6 +88,11 @@ INT WINAPI  WinMain(HINSTANCE hInstante, HINSTANCE hPrevInst, LPSTR lpCmdLine, I
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	static DOUBLE a = 0; // Ð½Ðµ ÑÐ¾Ñ…Ñ€Ð°Ð½ÑÐµÐ¼ Ð² Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½ÑƒÑŽ Ð°, Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð² Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½ÑƒÑŽ b 
+	DOUBLE b = 0;
+	static CHAR operation = 0;
+	static BOOL input = FALSE;
+	static BOOL operation_input = false;
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -103,7 +109,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			NULL
 		);
 		//SendMessage(hDisplay, WM_SETTEXT, 0, (LPARAM)"Display");
-		int i_digit = 1;
+		INT i_digit = 1;
 		CHAR sz_digit[2] = {};
 		/*for (int i = 3; i > 0; i--)
 		{
@@ -137,7 +143,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 						g_i_BTN_START_y + g_i_BTN_SIZE_WITH_INTERVAL * i,
 						g_i_BTN_SIZE, g_i_BTN_SIZE,
 						hwnd,
-						(HMENU)IDC_BUTTON_0 + i_digit,
+						(HMENU)(IDC_BUTTON_0 + i_digit),
 						GetModuleHandle(NULL),
 						NULL
 					);
@@ -158,8 +164,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		CreateWindowEx
 		(
 			NULL, "BUTTON", ".",
-			WS_CHILDWINDOW | WS_VISIBLE | BS_PUSHBUTTON,
-			g_i_BTN_START_x + g_i_BTN_SIZE_WITH_INTERVAL*2, // ðàñïîëîæåíèå ïî õ
+			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
+			g_i_BTN_START_x + g_i_BTN_SIZE_WITH_INTERVAL*2, // Ñ€Ð°ÑÐ¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ð¿Ð¾ Ñ…
 			g_i_BTN_START_y + g_i_BTN_SIZE_WITH_INTERVAL*3,
 			g_i_BTN_SIZE,g_i_BTN_SIZE,
 			hwnd,
@@ -211,7 +217,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			NULL, "BUTTON", "=",
 			WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
 			g_i_BTN_START_x + g_i_BTN_SIZE_WITH_INTERVAL * 4, g_i_BTN_START_y + g_i_BTN_SIZE_WITH_INTERVAL*2,
-			g_i_BTN_SIZE, g_i_BTN_SIZE_DOUBLE, // ðàñïîëîæåíèå íà êîíñîëå(ðàçìåð êíîïêè)
+			g_i_BTN_SIZE, g_i_BTN_SIZE_DOUBLE, // Ñ€Ð°ÑÐ¿Ð¾Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ Ð½Ð° ÐºÐ¾Ð½ÑÐ¾Ð»Ðµ(Ñ€Ð°Ð·Ð¼ÐµÑ€ ÐºÐ½Ð¾Ð¿ÐºÐ¸)
 			hwnd,
 			(HMENU)IDC_BUTTON_EQUAL,
 			GetModuleHandle(NULL),
@@ -219,7 +225,67 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 	}
 		break;
+	
 	case WM_COMMAND:
+	{
+		CONST INT SIZE = 256; 
+		CHAR sz_buffer[SIZE] = {};
+		HWND hStatic = GetDlgItem(hwnd, IDC_STATIC);
+		SendMessage(hStatic, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
+		if (LOWORD(wParam) >= IDC_BUTTON_0 && LOWORD(wParam) <= IDC_BUTTON_9|| LOWORD(wParam) == IDC_BUTTON_POINT)
+		{
+			CHAR sz_symbol[2] = {};
+			sz_symbol[0] = CHAR(LOWORD(wParam) - IDC_BUTTON_0 + '0');
+			if (LOWORD(wParam) == IDC_BUTTON_POINT)			
+			{
+				if (strchr(sz_buffer,'.'))break;
+				sz_symbol[0] = '.';
+			}
+			/*if (strcmp(sz_buffer, "0") == 0)
+			{
+				SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)"");
+				sz_buffer[0] == CHAR(LOWORD(wParam) - IDC_BUTTON_0 + '0');
+				SendMessage (hStatic, WM_SETTEXT, )
+			}*/
+			strcat(sz_buffer, sz_symbol);
+			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_CLEAR)
+		{
+			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)"");
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_BSP)
+		{
+			if (strcmp(sz_buffer, "0") == 0)break;  // strcmp = ÑÑ‚Ñ€Ð¾ÐºÐ°, Ð½Ð° ÐºÐ¾Ð½Ñ†Ðµ ÑÑ‚Ð¾Ð¸Ñ‚ 0;
+			sz_buffer[strlen(sz_buffer) - 1] = 0;
+			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+		}
+		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_SLASH)
+		{
+			
+			b = atof(sz_buffer);
+			
+			switch (LOWORD(wParam))
+			{
+			case IDC_BUTTON_PLUS: operation = '+';		break;
+			case IDC_BUTTON_MINUS: operation = '-';		break;
+			case IDC_BUTTON_ASTER: operation = '*';		break;
+			case IDC_BUTTON_SLASH: operation = '/';		break;
+			}
+			operation_input = TRUE; 
+		}
+		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
+		{
+			switch (LOWORD(wParam))
+			{
+			case IDC_BUTTON_PLUS: a += b; break;
+			case IDC_BUTTON_MINUS: a -= b; break;
+			case IDC_BUTTON_ASTER: a *= b; break;
+			case IDC_BUTTON_SLASH: a /= b; break;
+			}
+			operation_input = FALSE;
+		}
+	}
 		break; 
 	case WM_DESTROY: PostQuitMessage(0); break;
 	case WM_CLOSE: DestroyWindow(hwnd); break; 
