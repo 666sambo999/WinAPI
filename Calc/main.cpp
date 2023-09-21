@@ -2,6 +2,7 @@
 #include <windows.h>
 #include"resource.h"
 #include"resource1.h"
+#include<cstdio>
 
 CONST CHAR g_sz_WINDOWS_CLASS[] = "My Calculator";
 
@@ -89,8 +90,8 @@ INT WINAPI  WinMain(HINSTANCE hInstante, HINSTANCE hPrevInst, LPSTR lpCmdLine, I
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static DOUBLE a = 0; // не сохраняем в переменную а, только в переменную b 
-	DOUBLE b = 0;
-	static CHAR operation = 0;
+	static DOUBLE b = 0;		// static = будет храниться в области памяти(глобальной), инициализация переменной происходит только один раз  
+	static INT operation = 0;
 	static BOOL input = FALSE;
 	static BOOL operation_input = false;
 	switch (uMsg)
@@ -234,6 +235,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SendMessage(hStatic, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
 		if (LOWORD(wParam) >= IDC_BUTTON_0 && LOWORD(wParam) <= IDC_BUTTON_9|| LOWORD(wParam) == IDC_BUTTON_POINT)
 		{
+			DOUBLE d_buffer = atof(sz_buffer);
+			if (d_buffer == a)
+			{
+				SendMessage(hStatic, WM_SETTEXT, SIZE, (LPARAM)"");
+				sz_buffer[0] = 0;		// зануляем буффер 
+			}
 			CHAR sz_symbol[2] = {};
 			sz_symbol[0] = CHAR(LOWORD(wParam) - IDC_BUTTON_0 + '0');
 			if (LOWORD(wParam) == IDC_BUTTON_POINT)			
@@ -249,10 +256,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}*/
 			strcat(sz_buffer, sz_symbol);
 			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)sz_buffer);
+			input = TRUE;
 		}
 		if (LOWORD(wParam) == IDC_BUTTON_CLEAR)
 		{
 			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)"");
+			a = b = operation = 0;
+			input = FALSE;
+			operation_input = FALSE;
 		}
 		if (LOWORD(wParam) == IDC_BUTTON_BSP)
 		{
@@ -260,30 +271,51 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			sz_buffer[strlen(sz_buffer) - 1] = 0;
 			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
-		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_SLASH)
+		if (LOWORD(wParam) >= IDC_BUTTON_PLUS && LOWORD(wParam) <= IDC_BUTTON_SLASH) // кнопки 
 		{
-			
-			b = atof(sz_buffer);
-			
-			switch (LOWORD(wParam))
+			SendMessage(hStatic, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
+			if (input)
+			{
+				b = atof(sz_buffer);
+				input = FALSE;
+			}
+			if (a == 0)a = b;
+			SendMessage(hwnd, WM_COMMAND,IDC_BUTTON_EQUAL,0);
+			operation = LOWORD(wParam);
+			/*switch (LOWORD(wParam))
 			{
 			case IDC_BUTTON_PLUS: operation = '+';		break;
 			case IDC_BUTTON_MINUS: operation = '-';		break;
 			case IDC_BUTTON_ASTER: operation = '*';		break;
 			case IDC_BUTTON_SLASH: operation = '/';		break;
-			}
+			}*/
 			operation_input = TRUE; 
 		}
 		if (LOWORD(wParam) == IDC_BUTTON_EQUAL)
 		{
-			switch (LOWORD(wParam))
+			if (input)
 			{
-			case IDC_BUTTON_PLUS: a += b; break;
-			case IDC_BUTTON_MINUS: a -= b; break;
-			case IDC_BUTTON_ASTER: a *= b; break;
-			case IDC_BUTTON_SLASH: a /= b; break;
+				SendMessage(hStatic, WM_GETTEXT, SIZE, (LPARAM)sz_buffer);
+				b = atof(sz_buffer);
+				input = FALSE;
+			}
+			/*switch (operation)
+			{
+			case '+':  a += b;	break;
+			case '-':  a -= b;	break;
+			case '*':  a *= b;	break;
+			case '/':  a /= b;	break;
+			}*/
+			switch (operation)
+			{
+			case IDC_BUTTON_PLUS:	a += b;		break;
+			case IDC_BUTTON_MINUS:	a -= b;		break;
+			case IDC_BUTTON_ASTER:	a *= b;		break;
+			case IDC_BUTTON_SLASH:	a /= b;		break;
 			}
 			operation_input = FALSE;
+			sprintf(sz_buffer, "%F", a);
+			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
 	}
 		break; 
