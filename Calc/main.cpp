@@ -242,7 +242,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				sz_buffer[0] = 0;		// зануляем буффер 
 			}
 			CHAR sz_symbol[2] = {};
-			sz_symbol[0] = CHAR(LOWORD(wParam) - IDC_BUTTON_0 + '0');
+			sz_symbol[0] = CHAR(LOWORD(wParam) - IDC_BUTTON_0 + '0'); // в char прилетает значение, потом мы вычетаем IDC-button  и + ACII код 0(48)
 			if (LOWORD(wParam) == IDC_BUTTON_POINT)			
 			{
 				if (strchr(sz_buffer,'.'))break;
@@ -319,6 +319,33 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 	}
 		break; 
+	case WM_KEYDOWN:
+	{
+		if (GetKeyState(VK_SHIFT) < 0)
+		{
+			if (wParam == 0x38)SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_ASTER, 0);
+		}
+		else if (wParam >= 0x30 && wParam <= 0x39)	// цифры от 0 до 9 
+		{
+			SendMessage(hwnd, WM_COMMAND, wParam - 0x30 + 1000, 0); // мы отправляем сообщение нашему окну(WM_COMMAND) 0x30 - ноль в 16-системе(48)/ обратная формула 
+		}// фокус - это часть окна, которая принимает команды с клавиатуры 
+		if (LOWORD(wParam) >= 0x60 && LOWORD(wParam) <= 0x69)
+		{
+			SendMessage(hwnd, WM_COMMAND, wParam - 0x60 + 1000, 0);
+		}
+		switch (LOWORD(wParam))
+		{
+		case VK_OEM_PLUS:	SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_PLUS, 0); break;
+		case VK_OEM_MINUS:	SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_MINUS, 0); break;
+		case VK_MULTIPLY:	SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_ASTER, 0); break;
+		case VK_OEM_2: 
+		case VK_DIVIDE:		SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_SLASH, 0); break;
+		case VK_RETURN:		SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_EQUAL, 0); break; 
+		case VK_ESCAPE:		SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_CLEAR, 0); break; 
+		case VK_BACK:		SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_BSP, 0); break;
+		}
+	}
+		break;
 	case WM_DESTROY: PostQuitMessage(0); break;
 	case WM_CLOSE: DestroyWindow(hwnd); break; 
 	default: return DefWindowProc(hwnd, uMsg, wParam, lParam);
