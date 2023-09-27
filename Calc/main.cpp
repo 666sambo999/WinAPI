@@ -2,10 +2,11 @@
 #include <windows.h>
 #include"resource.h"
 #include"resource1.h"
+//#include"button.h"
 #include<cstdio>
 
-CONST CHAR g_sz_WINDOWS_CLASS[] = "My Calculator";
-
+CONST CHAR g_sz_WINDOWS_CLASS[] = "Calculator the best";
+CONST CHAR g_sz_DEFAULT_THEME[] = "Calc"; 
 // g- global 
 // sz - String Zero; 
 CONST INT g_i_START_x = 10; 
@@ -27,7 +28,15 @@ CONST INT g_i_WINDOWS_HEIDTH = g_i_DISPLAY_HEIDHT + g_i_START_y*3 + g_i_BTN_SIZE
 
 CONST CHAR g_OPERATION[] = "+-*/";
 
+CONST CHAR g_i_DISPLAY_FONT[] = "Alabama";
+CONST INT g_i_DISPLAY_FONT_HEIGHT = g_i_DISPLAY_HEIDHT - 2; 
+CONST INT g_i_DISPLAY_FONT_WIDTH = g_i_DISPLAY_FONT_HEIGHT/ 2.5; 
+
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+//VOID SetTheme(HWND hwnd);
+VOID SetTheme(HWND hwnd, CONST CHAR sz_theme[]);
 
 INT WINAPI  WinMain(HINSTANCE hInstante, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -110,6 +119,38 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			NULL
 		);
 		//SendMessage(hDisplay, WM_SETTEXT, 0, (LPARAM)"Display");
+		//LOGFONT lFont; 
+		//ZeroMemory(&lFont, sizeof(lFont));
+		//lFont.lfHeight = 24;
+		//lFont.lfWidth = 14;
+		//lFont.lfEscapement = 6;		// наклон 
+		//lFont.lfOrientation = 0;
+		//lFont.lfWeight = FW_DEMIBOLD;		// жирность шрифта 
+		//lFont.lfItalic = FALSE;			// курсив 
+		//lFont.lfUnderline = FALSE;		// подчеркивание 
+		//lFont.lfStrikeOut = FALSE;		// перечеркнутый 
+		//lFont.lfCharSet = DEFAULT_CHARSET; 	// 
+		//lFont.lfOutPrecision = OUT_TT_PRECIS; 
+		//lFont.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+		//lFont.lfQuality = ANTIALIASED_QUALITY;
+		//lFont.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+		//strcpy (lFont.lfFaceName, "Arial");
+
+		//HFONT hFont = CreateFontIndirect(&lFont);
+		HFONT hFont = CreateFont
+		(
+			g_i_DISPLAY_HEIDHT,g_i_DISPLAY_FONT_WIDTH,
+			GM_ADVANCED, 0, FW_DEMIBOLD,
+			FALSE, 0, 0,
+			DEFAULT_CHARSET,
+			OUT_CHARACTER_PRECIS,
+			CLIP_CHARACTER_PRECIS, 
+			ANTIALIASED_QUALITY,
+			DEFAULT_PITCH| FF_DONTCARE,
+			g_i_DISPLAY_FONT
+		);
+		SendMessage(hDisplay, WM_SETFONT, (WPARAM)hFont, TRUE);
+
 		INT i_digit = 1;
 		CHAR sz_digit[2] = {};
 		/*for (int i = 3; i > 0; i--)
@@ -139,7 +180,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					CreateWindowEx
 					(
 						NULL, "BUTTON", sz_digit,
-						WS_CHILDWINDOW | WS_VISIBLE | BS_PUSHBUTTON,
+						WS_CHILDWINDOW | WS_VISIBLE | BS_PUSHBUTTON| BS_BITMAP,
 						g_i_BTN_START_x + g_i_BTN_SIZE_WITH_INTERVAL * j,
 						g_i_BTN_START_y + g_i_BTN_SIZE_WITH_INTERVAL * i,
 						g_i_BTN_SIZE, g_i_BTN_SIZE,
@@ -150,11 +191,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 					);
 					i_digit++;
 				}
-		}
+			}
+		/////////////////////////////////////////////////////////////////
 		CreateWindowEx
 		(
 			NULL, "BUTTON", "0",
-			WS_CHILDWINDOW | WS_VISIBLE | BS_PUSHBUTTON,
+			WS_CHILDWINDOW | WS_VISIBLE | BS_PUSHBUTTON |BS_BITMAP,
 			g_i_BTN_START_x, g_i_BTN_START_y+ g_i_BTN_SIZE_WITH_INTERVAL*3,
 			g_i_BTN_SIZE_DOUBLE,g_i_BTN_SIZE,
 			hwnd,
@@ -162,6 +204,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 		);
+		//strcpy(sz_skin, g_sz_DEFAULT_SKIN);
+		SetTheme(hwnd, g_sz_DEFAULT_THEME);
+
+		/////////////////////////////////////////////////////////////////////
 		CreateWindowEx
 		(
 			NULL, "BUTTON", ".",
@@ -191,6 +237,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 				NULL
 			);
 		}
+		//HWND hBtnPlus = GetDlgItem(hwnd, IDC_BUTTON_PLUS);
+		//HBITMAP hBitMap = LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_BITMAP_PLUS)); // через ф-ю GetModuleHandle можно получить hInstante
+		//SendMessage(hBtnPlus, BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBitMap); 
+		
+
 		CreateWindowEx
 		(
 			NULL,"BUTTON", "<-",
@@ -225,8 +276,29 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			NULL
 		);
 	}
-		break;
-	
+	break;
+	case WM_CTLCOLORSTATIC:			// цвет шрифта на дисплее
+	{
+		if((HWND)lParam == GetDlgItem(hwnd, IDC_STATIC))
+		{
+			HDC hdc = (HDC)wParam;
+			SetBkMode(hdc, OPAQUE);
+			SetTextColor(hdc, RGB(230, 0, 200));
+			return (INT)GetStockObject(NULL_BRUSH);
+		}
+
+	}
+	break; 
+	case WM_CTLCOLOREDIT:
+	{
+		HDC hdc = (HDC)wParam;
+		SetBkMode(hdc, OPAQUE);
+		SetBkColor(hdc, RGB(0, 0, 100)); HBRUSH hBruch = CreateSolidBrush(RGB(0, 0, 250));
+		SetTextColor(hdc, RGB(255, 0, 0));
+		return (LRESULT)hBruch;
+
+	}
+
 	case WM_COMMAND:
 	{
 		CONST INT SIZE = 256; 
@@ -267,7 +339,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		if (LOWORD(wParam) == IDC_BUTTON_BSP)
 		{
-			if (strcmp(sz_buffer, "0") == 0)break;  // strcmp = строка, на конце стоит 0;
+			if (strcmp(sz_buffer, "0") == 0 || strlen (sz_buffer) == 0)break;  // strcmp = строка, на конце стоит 0;
 			sz_buffer[strlen(sz_buffer) - 1] = 0;
 			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
@@ -335,20 +407,76 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		switch (LOWORD(wParam))
 		{
-		case VK_OEM_PLUS:	SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_PLUS, 0); break;
+		case VK_OEM_PLUS:	SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_PLUS, 0);	break;
 		case VK_OEM_MINUS:	SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_MINUS, 0); break;
 		case VK_MULTIPLY:	SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_ASTER, 0); break;
 		case VK_OEM_2: 
 		case VK_DIVIDE:		SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_SLASH, 0); break;
 		case VK_RETURN:		SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_EQUAL, 0); break; 
 		case VK_ESCAPE:		SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_CLEAR, 0); break; 
-		case VK_BACK:		SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_BSP, 0); break;
+		case VK_BACK:		SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_BSP, 0);	break;
+		case VK_OEM_PERIOD: SendMessage(hwnd, WM_COMMAND, IDC_BUTTON_POINT, 0); break; 
 		}
 	}
 		break;
+	case WM_CONTEXTMENU:		// создание с помощью контексного меню
+	{
+		HMENU hMenu = CreatePopupMenu();			// пустое меню
+		InsertMenu(hMenu, 0, MF_BYPOSITION | MF_STRING, IDC_EXIT, "Exit");
+		InsertMenu(hMenu, 0, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);			// появляется полоска, отделяет выход 
+		InsertMenu(hMenu, 0, MF_BYPOSITION | MF_STRING, IDC_SQUARE, "Square button");
+		InsertMenu(hMenu, 0, MF_BYPOSITION | MF_STRING, IDC_BLACK, "Black button");
+
+		switch (TrackPopupMenuEx(hMenu, TPM_BOTTOMALIGN | TPM_LEFTALIGN | TPM_RETURNCMD, LOWORD(lParam), HIWORD(lParam), hwnd, NULL))
+		{
+		case IDC_BLACK: SetTheme(hwnd, "Calc");  break;
+		case IDC_SQUARE: SetTheme(hwnd, "Button"); break;
+		case IDC_EXIT: SendMessage(hwnd, IDC_EXIT, 0, 0); 
+		}
+		//SetTheme(hwnd, sz_theme);
+	}
+	break;
 	case WM_DESTROY: PostQuitMessage(0); break;
+	case IDC_EXIT:
 	case WM_CLOSE: DestroyWindow(hwnd); break; 
 	default: return DefWindowProc(hwnd, uMsg, wParam, lParam);
 	}
 	return NULL;
+}
+
+VOID SetTheme(HWND hwnd, CONST CHAR sz_theme[])
+{
+	CONST INT SIZE = 10;
+	HWND hButton[SIZE] = {};
+	//HBITMAP hBitmap[SIZE] = {};
+	for (int i = 0; i < SIZE; i++)
+	{
+		hButton[i] = GetDlgItem(hwnd, i + IDC_BUTTON_0);
+		//hBitmap[i] = LoadBitmap(GetModuleHandle(NULL), MAKEINTRESOURCE(i + IDB_BITMAP_0));
+		//SendMessage(hButton[i], BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBitmap[i]);
+		CHAR sz_filename[FILENAME_MAX] = {};
+		sprintf(sz_filename, "Theme\\%s\\%i.bmp",sz_theme, i);
+		HBITMAP hBitmap = (HBITMAP)LoadImage
+		(
+			GetModuleHandle(NULL),
+			sz_filename,
+			IMAGE_BITMAP,
+			i > 0 ? g_i_BTN_SIZE : g_i_BTN_SIZE_DOUBLE, g_i_BTN_SIZE,
+			LR_LOADFROMFILE
+		);
+		/*DWORD dwErrorMessageID = GetLastError();
+		LPSTR lpMessageBuffer = NULL;
+		DWORD dwSize = FormatMessage
+		(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			dwErrorMessageID,
+			MAKELANGID(LANG_NEUTRAL, SUBLANG_RUSSIAN_RUSSIA),
+			(LPSTR)&lpMessageBuffer,
+			0,
+			NULL
+		);*/
+		//MessageBox(hwnd, lpMessageBuffer, "Error", MB_OK | MB_ICONERROR);
+		SendMessage(hButton[i], BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBitmap);
+	}
 }

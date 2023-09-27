@@ -134,11 +134,13 @@
     <ClInclude Include="resource1.h" />
   </ItemGroup>
   <ItemGroup>
+    <ResourceCompile Include="Icon.rc" />
     <ResourceCompile Include="Resource.rc" />
     <ResourceCompile Include="Resource1.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="calculator.ico" />
+    <Image Include="Plus.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
