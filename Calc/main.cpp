@@ -32,6 +32,11 @@ CONST CHAR g_i_DISPLAY_FONT[] = "Alabama";
 CONST INT g_i_DISPLAY_FONT_HEIGHT = g_i_DISPLAY_HEIDHT - 2; 
 CONST INT g_i_DISPLAY_FONT_WIDTH = g_i_DISPLAY_FONT_HEIGHT/ 2.5; 
 
+CONST COLORREF g_cr_BLACK = RGB(10, 10, 10);
+CONST COLORREF g_cr_SQUARE = RGB(128, 128, 128);
+
+CONST HBRUSH hBrushSquare = CreateSolidBrush(RGB(91, 91, 89));	// кисточки 
+CONST HBRUSH hBrushBlack = CreateSolidBrush(RGB(10, 10, 10));
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -52,6 +57,7 @@ INT WINAPI  WinMain(HINSTANCE hInstante, HINSTANCE hPrevInst, LPSTR lpCmdLine, I
 	wc.hIcon = (HICON)LoadIcon(hInstante, MAKEINTRESOURCE(IDI_ICON_CALK));
 	wc.hIconSm = (HICON)LoadImage(hInstante, "calculation.ico", IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
 	wc.hCursor = (HCURSOR)LoadImage(hInstante, "Busy.ani", IMAGE_CURSOR, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
+	//wc.hbrBackground = CreateSolidBrush(RGB(128, 128, 128));		// меняем цвет панели через класс
 	wc.hbrBackground = (HBRUSH)COLOR_WINDOW; 
 
 	wc.hInstance = hInstante;
@@ -102,7 +108,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static DOUBLE b = 0;		// static = будет храниться в области памяти(глобальной), инициализация переменной происходит только один раз  
 	static INT operation = 0;
 	static BOOL input = FALSE;
-	static BOOL operation_input = false;
+	static BOOL operation_input = false; 
+
+	static HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 240));
+	static CHAR sz_theme[FILENAME_MAX] = {};
 	switch (uMsg)
 	{
 	case WM_CREATE:
@@ -205,6 +214,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			NULL
 		);
 		//strcpy(sz_skin, g_sz_DEFAULT_SKIN);
+		strcpy(sz_theme, g_sz_DEFAULT_THEME);
 		SetTheme(hwnd, g_sz_DEFAULT_THEME);
 
 		/////////////////////////////////////////////////////////////////////
@@ -277,28 +287,34 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 	}
 	break;
-	case WM_CTLCOLORSTATIC:			// цвет шрифта на дисплее
+	case WM_PAINT:
+	{
+		PAINTSTRUCT hPaint;
+		HDC hdc = BeginPaint(hwnd, &hPaint); 
+		FillRect(hdc, &hPaint.rcPaint, hBrush);
+	}
+	break;
+	case WM_CTLCOLORSTATIC:					// цвет шрифта на дисплее
 	{
 		if((HWND)lParam == GetDlgItem(hwnd, IDC_STATIC))
 		{
 			HDC hdc = (HDC)wParam;
+			SetDCBrushColor(hdc, RGB(100, 100, 100));
 			SetBkMode(hdc, OPAQUE);
-			SetTextColor(hdc, RGB(230, 0, 200));
-			return (INT)GetStockObject(NULL_BRUSH);
+			SetTextColor(hdc, RGB(100, 100, 100));
+			return (INT)GetStockObject(DC_BRUSH);
 		}
-
 	}
 	break; 
 	case WM_CTLCOLOREDIT:
 	{
 		HDC hdc = (HDC)wParam;
 		SetBkMode(hdc, OPAQUE);
-		SetBkColor(hdc, RGB(0, 0, 100)); HBRUSH hBruch = CreateSolidBrush(RGB(0, 0, 250));
+		SetBkColor(hdc, RGB(0, 0, 200)); HBRUSH hBruch = CreateSolidBrush(RGB(0, 100, 250));
 		SetTextColor(hdc, RGB(255, 0, 0));
 		return (LRESULT)hBruch;
-
 	}
-
+	break; 
 	case WM_COMMAND:
 	{
 		CONST INT SIZE = 256; 
@@ -389,8 +405,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			sprintf(sz_buffer, "%F", a);
 			SendMessage(hStatic, WM_SETTEXT, 0, (LPARAM)sz_buffer);
 		}
+		SetFocus(hwnd);
 	}
-		break; 
+	break; 
 	case WM_KEYDOWN:
 	{
 		if (GetKeyState(VK_SHIFT) < 0)
@@ -429,10 +446,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		switch (TrackPopupMenuEx(hMenu, TPM_BOTTOMALIGN | TPM_LEFTALIGN | TPM_RETURNCMD, LOWORD(lParam), HIWORD(lParam), hwnd, NULL))
 		{
-		case IDC_BLACK: SetTheme(hwnd, "Calc");  break;
-		case IDC_SQUARE: SetTheme(hwnd, "Button"); break;
+		//case IDC_BLACK: SetTheme(hwnd, "Calc");  break;
+		//case IDC_SQUARE: SetTheme(hwnd, "Button"); break;
+		case IDC_BLACK: strcpy(sz_theme, "Calc"); hBrush = hBrushBlack; break;
+		case IDC_SQUARE: strcpy(sz_theme, "Button"); hBrush = hBrushSquare; break;
 		case IDC_EXIT: SendMessage(hwnd, IDC_EXIT, 0, 0); 
 		}
+		SetTheme(hwnd, sz_theme);
+		//SendMessage(hwnd, WM_PAINT, 0, 0);
 		//SetTheme(hwnd, sz_theme);
 	}
 	break;
@@ -479,4 +500,10 @@ VOID SetTheme(HWND hwnd, CONST CHAR sz_theme[])
 		//MessageBox(hwnd, lpMessageBuffer, "Error", MB_OK | MB_ICONERROR);
 		SendMessage(hButton[i], BM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBitmap);
 	}
+	//if (strcmp(sz_theme, "Calc")==0)SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)hBrushBlack);
+	//if (strcmp(sz_theme, "Button")==0)SetClassLongPtr(hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)hBrushSquare);
+	HDC hdc = GetDC(hwnd);
+	if (strcmp(sz_theme, "Calc") == 0) SetDCBrushColor(hdc, g_cr_BLACK);
+	if (strcmp(sz_theme, "Button")==0) SetDCBrushColor(hdc, g_cr_SQUARE);
+	ReleaseDC(hwnd, hdc);
 }
