@@ -35,8 +35,8 @@ CONST INT g_i_DISPLAY_FONT_WIDTH = g_i_DISPLAY_FONT_HEIGHT/ 2.5;
 CONST COLORREF g_cr_BLACK = RGB(10, 10, 10);
 CONST COLORREF g_cr_SQUARE = RGB(128, 128, 128);
 
-CONST HBRUSH hBrushSquare = CreateSolidBrush(RGB(91, 91, 89));	// кисточки 
-CONST HBRUSH hBrushBlack = CreateSolidBrush(RGB(10, 10, 10));
+CONST HBRUSH hBrushSquare = CreateSolidBrush(g_cr_BLACK);	// кисточки 
+CONST HBRUSH hBrushBlack = CreateSolidBrush(g_cr_SQUARE);
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -110,7 +110,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	static BOOL input = FALSE;
 	static BOOL operation_input = false; 
 
-	static HBRUSH hBrush = CreateSolidBrush(RGB(0, 0, 240));
+	static COLORREF crBackground = (RGB(128, 128, 100));
+	static HBRUSH hBrush = CreateSolidBrush(crBackground);
 	static CHAR sz_theme[FILENAME_MAX] = {};
 	switch (uMsg)
 	{
@@ -291,7 +292,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		PAINTSTRUCT hPaint;
 		HDC hdc = BeginPaint(hwnd, &hPaint); 
+		HBRUSH hBackground = CreateSolidBrush(crBackground);
 		FillRect(hdc, &hPaint.rcPaint, hBrush);
+		EndPaint(hwnd, &hPaint);
+		DeleteObject(hBackground);
 	}
 	break;
 	case WM_CTLCOLORSTATIC:					// цвет шрифта на дисплее
@@ -448,13 +452,28 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 		//case IDC_BLACK: SetTheme(hwnd, "Calc");  break;
 		//case IDC_SQUARE: SetTheme(hwnd, "Button"); break;
-		case IDC_BLACK: strcpy(sz_theme, "Calc"); hBrush = hBrushBlack; break;
-		case IDC_SQUARE: strcpy(sz_theme, "Button"); hBrush = hBrushSquare; break;
+		case IDC_BLACK: strcpy(sz_theme, "Calc");		crBackground = g_cr_BLACK; break;
+		case IDC_SQUARE: strcpy(sz_theme, "Button");	crBackground = g_cr_SQUARE; break;
 		case IDC_EXIT: SendMessage(hwnd, IDC_EXIT, 0, 0); 
 		}
 		SetTheme(hwnd, sz_theme);
 		//SendMessage(hwnd, WM_PAINT, 0, 0);
 		//SetTheme(hwnd, sz_theme);
+		
+		//DWORD dwErrorMessageID = GetLastError();		// ошибка 
+		//LPSTR lpMessageBuffer = NULL;
+		//DWORD sdwSize = FormatMessage
+		//(
+		//	FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		//	NULL,
+		//	dwErrorMessageID,
+		//	MAKELANGID(LANG_NEUTRAL, SUBLANG_RUSSIAN_RUSSIA),
+		//	(LPSTR)&lpMessageBuffer,
+		//	0,
+		//	NULL
+		//);
+		//MessageBox(hwnd, lpMessageBuffer, "Error", MB_OK | MB_ICONERROR);  
+
 	}
 	break;
 	case WM_DESTROY: PostQuitMessage(0); break;
@@ -506,4 +525,5 @@ VOID SetTheme(HWND hwnd, CONST CHAR sz_theme[])
 	if (strcmp(sz_theme, "Calc") == 0) SetDCBrushColor(hdc, g_cr_BLACK);
 	if (strcmp(sz_theme, "Button")==0) SetDCBrushColor(hdc, g_cr_SQUARE);
 	ReleaseDC(hwnd, hdc);
+	UpdateWindow(hwnd);
 }
