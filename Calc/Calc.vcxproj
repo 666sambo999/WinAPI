@@ -139,6 +139,7 @@
     <ResourceCompile Include="Resource1.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="bitmap1.bmp" />
     <Image Include="calculator.ico" />
     <Image Include="Plus.bmp" />
   </ItemGroup>

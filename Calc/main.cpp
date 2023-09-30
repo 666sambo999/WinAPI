@@ -58,8 +58,9 @@ INT WINAPI  WinMain(HINSTANCE hInstante, HINSTANCE hPrevInst, LPSTR lpCmdLine, I
 	wc.hIconSm = (HICON)LoadImage(hInstante, "calculation.ico", IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
 	wc.hCursor = (HCURSOR)LoadImage(hInstante, "Busy.ani", IMAGE_CURSOR, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_LOADFROMFILE);
 	//wc.hbrBackground = CreateSolidBrush(RGB(128, 128, 128));		// меняем цвет панели через класс
-	wc.hbrBackground = (HBRUSH)COLOR_WINDOW; 
-
+	//wc.hbrBackground = (HBRUSH)COLOR_WINDOW; 
+	wc.hbrBackground = CreatePatternBrush((HBITMAP)LoadImage(NULL, "star_wars.bmp", IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE));
+	
 	wc.hInstance = hInstante;
 	wc.lpszMenuName = 0;
 	wc.lpfnWndProc = WndProc;
@@ -91,6 +92,12 @@ INT WINAPI  WinMain(HINSTANCE hInstante, HINSTANCE hPrevInst, LPSTR lpCmdLine, I
 	}
 	ShowWindow(hwnd, nCmdShow);
 	UpdateWindow(hwnd);
+	/*HWND hBackground = CreateWindowEx(NULL, "background", SS_BITMAP | WS_CHILD | WS_VISIBLE, 0, 0, 300, 300, LPARAM(hwnd), NULL, NULL);
+	HBITMAP hBmp = (HBITMAP)LoadImage(NULL, "star_wars.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+	int e = GetLastError();
+	SendMessage(hBackground, STM_SETIMAGE, (WPARAM)IMAGE_BITMAP, (LPARAM)hBmp);*/
+	
+	
 	//3) Запуск цикла сообщений  
 	MSG msg;
 	while (GetMessage(&msg, 0, 0, 0) > 0)
@@ -101,6 +108,7 @@ INT WINAPI  WinMain(HINSTANCE hInstante, HINSTANCE hPrevInst, LPSTR lpCmdLine, I
 
 	return msg.wParam;
 }
+
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -288,14 +296,45 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		);
 	}
 	break;
+		PAINTSTRUCT hPaint;
+		HANDLE hBitmap, hOldBitmap;
+		RECT Rect;
+		BITMAP Bitmap;
+		HDC hdc, hCompatibleDC;
 	case WM_PAINT:
 	{
-		PAINTSTRUCT hPaint;
 		HDC hdc = BeginPaint(hwnd, &hPaint); 
 		HBRUSH hBackground = CreateSolidBrush(crBackground);
 		FillRect(hdc, &hPaint.rcPaint, hBrush);
+		/*EndPaint(hwnd, &hPaint);
+		DeleteObject(hBackground);*/
+		
+		// Загружаем bitmap, который будет отображаться в окне, из фаила.
+		hBitmap = LoadImage(NULL, "star.bmp",
+			IMAGE_BITMAP,
+			0, 0,
+			LR_LOADFROMFILE);
+		// Получаем размероность загруженного bitmap'a.
+		GetObject(hBitmap, sizeof(BITMAP), &Bitmap);
+		//Создаем совместный с контекстом окна контекст в памяти.
+		hCompatibleDC = CreateCompatibleDC(hdc);
+		//Делаем загруженный из фаила bitmap текущим в совместимом контексте.
+		hOldBitmap = SelectObject(hCompatibleDC, hBitmap);
+		//Определяем размер рабочей области окна.
+		GetClientRect(hwnd, &Rect);
+		//Копируем bitmap с совместимого на основной контекст с масштабированием.
+		StretchBlt(hdc, 0, 0, Rect.left, Rect.bottom,
+			hCompatibleDC, 0, 0, Bitmap.bmWidth,
+			Bitmap.bmHeight, SRCCOPY);
+		//Вновь делаем старый bitmap текущим.
+		SelectObject(hCompatibleDC, hOldBitmap);
+		//Удаляем загруженный с диска bitmap.
+		DeleteObject(hBitmap);
+		//Удаляем совместный контекст.
+		DeleteDC(hCompatibleDC);
+		//Освобождаем основной контекст, завершая перерисовку рабочей области окна.
 		EndPaint(hwnd, &hPaint);
-		DeleteObject(hBackground);
+	
 	}
 	break;
 	case WM_CTLCOLORSTATIC:					// цвет шрифта на дисплее
