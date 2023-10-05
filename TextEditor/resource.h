@@ -6,16 +6,16 @@
 
 #define IDR_MENU1                       101
 #define ID_HELP_ABOUT                   40001
-#define ID_FILE_OPEN                    40002
-#define ID_EDIT_FONT                    40003
-#define ID_EDIT_COPY                    40004
-#define ID_EDIT_FIND                    40005
-#define ID_FILE_OPEN40006               40006
-#define ID_FILE_SAVE                    40007
-#define ID_FILE_SAVE40008               40008
-#define ID_FILE_EXIT                    40009
-#define ID_EDIT_DELETE                  40010
-#define ID_EDIT_PASTE                   40011
+#define ID_FILE_NEW                     40002
+#define ID_FILE_OPEN                    40003
+#define ID_FILE_SAVE                    40004
+#define ID_FILE_SAVEAS                  40005
+#define ID_FILE_EXIT                    40006
+#define ID_EDIT_FONT                    40007
+#define ID_EDIT_COPY                    40008
+#define ID_EDIT_PAST                    40009
+#define ID_EDIT_FIND                    40010
+#define ID_EDIT_DELETE                  40011
 
 // Next default values for new objects
 // 
