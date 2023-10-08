@@ -39,7 +39,8 @@ INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, IN
 	//2) создание окна
 	HWND hwnd = CreateWindowEx
 	(
-		NULL, 
+		//NULL,
+		WS_EX_ACCEPTFILES, 
 		g_sz_Windows_Class,g_sz_Windows_Class,
 		WS_OVERLAPPEDWINDOW, 
 		CW_USEDEFAULT, CW_USEDEFAULT,
@@ -86,7 +87,7 @@ LRESULT CALLBACK WndProg(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		HWND hEdit = CreateWindowEx
 		(
 			NULL, RICHEDIT_CLASS, "", 
-			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE,
+			WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE| WS_VSCROLL|WS_HSCROLL, // HSCROLL - добавление полос прокрутки 
 			//rect.left, rect.top,
 			0,0,
 			//rect.right - rect.left, rect.bottom-rect.top, // размер и положения окна 
@@ -107,6 +108,8 @@ LRESULT CALLBACK WndProg(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			GetModuleHandle(NULL),
 			NULL
 			);
+		//DragAcceptFiles(hEdit, )
+
 	}
 		break; 
 	case WM_SIZE:
@@ -121,6 +124,18 @@ LRESULT CALLBACK WndProg(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		GetClientRect(hwnd, &reClient);
 		int iEditHeight = reClient.bottom - iStatusHeight;
 		SetWindowPos(hEdit, NULL, 0, 0, reClient.right - reClient.left, iEditHeight, SWP_NOZORDER);
+	}
+		break; 
+	case WM_DROPFILES:
+	{
+		//CHAR szFileName[FILENAME_MAX] = {};
+		DragQueryFile((HDROP)wParam, 0, szFileName, MAX_PATH);
+		HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
+		LoadTextFileEdit(hEdit, szFileName);// ф-я звгоняет текст 
+		DWORD dwTextLenght = SendMessage(hEdit, WM_GETTEXTLENGTH, 0, 0);
+		lpszFileText = (LPSTR)GlobalAlloc(GPTR, dwTextLenght + 1);
+		SendMessage(hEdit, WM_GETTEXT, dwTextLenght + 1, (LPARAM)lpszFileText);
+
 	}
 		break; 
 	case WM_COMMAND:
