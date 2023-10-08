@@ -4,7 +4,9 @@
 //
 #define IDC_EDIT						100
 
+
 #define IDR_MENU1                       101
+#define IDC_STATUS						102
 #define ID_HELP_ABOUT                   40001
 #define ID_FILE_NEW                     40002
 #define ID_FILE_OPEN                    40003
