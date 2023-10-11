@@ -6,11 +6,15 @@
 #include<cstdio>
 
 CONST CHAR g_sz_Windows_Class[] = "My Text Editor";
+HFONT g_hFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+COLORREF g_RGB_Text = RGB(0, 0, 0);
 
 LRESULT CALLBACK WndProg(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 BOOL LoadTextFileEdit(HWND hEdit, LPSTR lpszFileName);
 BOOL SaveTextFileEdit(HWND hEdit, LPSTR lpszFileName);
-BOOL FileWasChanger(HWND hEdit, LPSTR lpszFileText, LPSTR lpszText);
+//BOOL FileWasChanger(HWND hEdit, LPSTR lpszFileText, LPSTR lpszText);
+
+VOID SelectFont(HWND hwnd);
 
 INT WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInst, LPSTR lpCmdLine, INT nCmdShow)
 {
@@ -126,7 +130,7 @@ LRESULT CALLBACK WndProg(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		SetWindowPos(hEdit, NULL, 0, 0, reClient.right - reClient.left, iEditHeight, SWP_NOZORDER);
 	}
 		break; 
-	case WM_DROPFILES:
+	case WM_DROPFILES:// загоняет файл в текстовый редактор 
 	{
 		//CHAR szFileName[FILENAME_MAX] = {};
 		DragQueryFile((HDROP)wParam, 0, szFileName, MAX_PATH);
@@ -136,13 +140,19 @@ LRESULT CALLBACK WndProg(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		lpszFileText = (LPSTR)GlobalAlloc(GPTR, dwTextLenght + 1);
 		SendMessage(hEdit, WM_GETTEXT, dwTextLenght + 1, (LPARAM)lpszFileText);
 
+		HWND hStatus = GetDlgItem(hwnd, IDC_STATUS);
+		SendMessage(hStatus, SB_SETTEXT, 0, (LPARAM)szFileName);
+		
+		CHAR szTitle[FILENAME_MAX]{};
+		sprintf(szTitle, "%s - %s", g_sz_Windows_Class, strrchr(szFileName, '\\') + 1);
+		SendMessage(hwnd, WM_SETTEXT, 0, (LPARAM)szTitle);
 	}
 		break; 
 	case WM_COMMAND:
 	{
 		switch (LOWORD(wParam))
 		{
-		case ID_FILE_NEW:
+		case ID_FILE_NEW: // создаем новый файл 
 		{
 			HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
 			DWORD dwTextLength = SendMessage(hEdit, WM_GETTEXTLENGTH, 0, 0);
@@ -168,7 +178,7 @@ LRESULT CALLBACK WndProg(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		break; 
-		case ID_FILE_OPEN:
+		case ID_FILE_OPEN: // открываем файл 
 		{
 			BOOL cancel = FALSE;
 			HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
@@ -252,6 +262,9 @@ LRESULT CALLBACK WndProg(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 		}
 		break;
+		case ID_FILE_EXIT:SendMessage(hwnd, WM_CLOSE, 0, 0); break; 
+			////////////////////////////////////////////////////////////////////////
+		case ID_FORMAT_FONT: 	SelectFont(hwnd); break; 
 		}
 	}
 	break; 
@@ -360,4 +373,33 @@ BOOL FileWasChanger(HWND hEdit, LPSTR lpszFileText, LPSTR lpszText)
 		}
 	}
 	return fileChanger;
+}
+
+VOID SelectFont(HWND hwnd)
+{
+	CHOOSEFONT cf; 
+	LOGFONT lf; 
+	HWND hEdit = GetDlgItem(hwnd, IDC_EDIT);
+
+	ZeroMemory(&cf, sizeof(cf));
+	ZeroMemory(&lf, sizeof(lf));
+
+	GetObject(g_hFont, sizeof(LOGFONT), &lf);
+
+	cf.lStructSize = sizeof(cf);
+	cf.hwndOwner = hwnd; 
+	
+	cf.Flags = CF_EFFECTS | CF_INITTOLOGFONTSTRUCT | CF_SCREENFONTS;
+	cf.hInstance = GetModuleHandle(NULL);
+	cf.lpLogFont = &lf;
+	cf.rgbColors = g_RGB_Text; 
+
+	if (ChooseFont(&cf))
+	{
+		HFONT hf = CreateFontIndirect(&lf);
+		if (hf)g_hFont = hf;
+		else MessageBox(hwnd, "Font creation failed", "Error", MB_OK | MB_ICONERROR);
+	}
+	SendMessage(hEdit, WM_SETFONT, (WPARAM)g_hFont, TRUE);
+	SetFocus(hEdit);
 }
