@@ -31,6 +31,11 @@
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.label1 = new System.Windows.Forms.Label();
+            this.cms_Lbl1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cms_Lbl1_ChItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cms_Lbl1_ChFontColor = new System.Windows.Forms.ToolStripMenuItem();
+            this.cms_Lbl1BackColor = new System.Windows.Forms.ToolStripMenuItem();
+            this.cms_Lbl1_ShowControl = new System.Windows.Forms.ToolStripMenuItem();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.cbShowDate = new System.Windows.Forms.CheckBox();
             this.btnHideControl = new System.Windows.Forms.Button();
@@ -45,13 +50,8 @@
             this.cmHideControl = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.cmExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.cms_Lbl1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.cms_Lbl1_ChItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cms_Lbl1_ChFontColor = new System.Windows.Forms.ToolStripMenuItem();
-            this.cms_Lbl1BackColor = new System.Windows.Forms.ToolStripMenuItem();
-            this.cms_Lbl1_ShowControl = new System.Windows.Forms.ToolStripMenuItem();
-            this.contextMenuStrip.SuspendLayout();
             this.cms_Lbl1.SuspendLayout();
+            this.contextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -59,15 +59,54 @@
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.SystemColors.Control;
             this.label1.ContextMenuStrip = this.cms_Lbl1;
-            this.label1.Font = new System.Drawing.Font("Vladimir Script", 27.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Font = new System.Drawing.Font("Vladimir Script", 26.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Image = ((System.Drawing.Image)(resources.GetObject("label1.Image")));
-            this.label1.Location = new System.Drawing.Point(50, 28);
+            this.label1.Location = new System.Drawing.Point(41, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(92, 53);
+            this.label1.Size = new System.Drawing.Size(87, 50);
             this.label1.TabIndex = 0;
             this.label1.Text = "label1";
             this.label1.UseCompatibleTextRendering = true;
             this.label1.MouseHover += new System.EventHandler(this.label1_MouseHover);
+            // 
+            // cms_Lbl1
+            // 
+            this.cms_Lbl1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cms_Lbl1_ChItem,
+            this.cms_Lbl1_ChFontColor,
+            this.cms_Lbl1BackColor,
+            this.cms_Lbl1_ShowControl});
+            this.cms_Lbl1.Name = "cms_Lbl1";
+            this.cms_Lbl1.Size = new System.Drawing.Size(169, 92);
+            this.cms_Lbl1.Text = "Menu color";
+            // 
+            // cms_Lbl1_ChItem
+            // 
+            this.cms_Lbl1_ChItem.Name = "cms_Lbl1_ChItem";
+            this.cms_Lbl1_ChItem.Size = new System.Drawing.Size(168, 22);
+            this.cms_Lbl1_ChItem.Text = "Choose Font";
+            this.cms_Lbl1_ChItem.Click += new System.EventHandler(this.cms_Lbl1_ChItem_Click);
+            // 
+            // cms_Lbl1_ChFontColor
+            // 
+            this.cms_Lbl1_ChFontColor.Name = "cms_Lbl1_ChFontColor";
+            this.cms_Lbl1_ChFontColor.Size = new System.Drawing.Size(168, 22);
+            this.cms_Lbl1_ChFontColor.Text = "Font color";
+            // 
+            // cms_Lbl1BackColor
+            // 
+            this.cms_Lbl1BackColor.Name = "cms_Lbl1BackColor";
+            this.cms_Lbl1BackColor.Size = new System.Drawing.Size(168, 22);
+            this.cms_Lbl1BackColor.Text = "Background color";
+            // 
+            // cms_Lbl1_ShowControl
+            // 
+            this.cms_Lbl1_ShowControl.Checked = true;
+            this.cms_Lbl1_ShowControl.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cms_Lbl1_ShowControl.Name = "cms_Lbl1_ShowControl";
+            this.cms_Lbl1_ShowControl.Size = new System.Drawing.Size(168, 22);
+            this.cms_Lbl1_ShowControl.Text = "Show control";
+            this.cms_Lbl1_ShowControl.Click += new System.EventHandler(this.cms_Lbl1_ShowControl_Click);
             // 
             // timer1
             // 
@@ -78,7 +117,7 @@
             // 
             this.cbShowDate.AutoSize = true;
             this.cbShowDate.Font = new System.Drawing.Font("MS UI Gothic", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cbShowDate.Location = new System.Drawing.Point(41, 102);
+            this.cbShowDate.Location = new System.Drawing.Point(41, 75);
             this.cbShowDate.Name = "cbShowDate";
             this.cbShowDate.Size = new System.Drawing.Size(150, 31);
             this.cbShowDate.TabIndex = 1;
@@ -183,50 +222,11 @@
             this.cmExit.Text = "Exit";
             this.cmExit.Click += new System.EventHandler(this.cmExit_Click);
             // 
-            // cms_Lbl1
-            // 
-            this.cms_Lbl1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cms_Lbl1_ChItem,
-            this.cms_Lbl1_ChFontColor,
-            this.cms_Lbl1BackColor,
-            this.cms_Lbl1_ShowControl});
-            this.cms_Lbl1.Name = "cms_Lbl1";
-            this.cms_Lbl1.Size = new System.Drawing.Size(181, 114);
-            this.cms_Lbl1.Text = "Menu color";
-            // 
-            // cms_Lbl1_ChItem
-            // 
-            this.cms_Lbl1_ChItem.Name = "cms_Lbl1_ChItem";
-            this.cms_Lbl1_ChItem.Size = new System.Drawing.Size(180, 22);
-            this.cms_Lbl1_ChItem.Text = "Choose Font";
-            this.cms_Lbl1_ChItem.Click += new System.EventHandler(this.cms_Lbl1_ChItem_Click);
-            // 
-            // cms_Lbl1_ChFontColor
-            // 
-            this.cms_Lbl1_ChFontColor.Name = "cms_Lbl1_ChFontColor";
-            this.cms_Lbl1_ChFontColor.Size = new System.Drawing.Size(180, 22);
-            this.cms_Lbl1_ChFontColor.Text = "Font color";
-            // 
-            // cms_Lbl1BackColor
-            // 
-            this.cms_Lbl1BackColor.Name = "cms_Lbl1BackColor";
-            this.cms_Lbl1BackColor.Size = new System.Drawing.Size(180, 22);
-            this.cms_Lbl1BackColor.Text = "Background color";
-            // 
-            // cms_Lbl1_ShowControl
-            // 
-            this.cms_Lbl1_ShowControl.Checked = true;
-            this.cms_Lbl1_ShowControl.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cms_Lbl1_ShowControl.Name = "cms_Lbl1_ShowControl";
-            this.cms_Lbl1_ShowControl.Size = new System.Drawing.Size(180, 22);
-            this.cms_Lbl1_ShowControl.Text = "Show control";
-            this.cms_Lbl1_ShowControl.Click += new System.EventHandler(this.cms_Lbl1_ShowControl_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.Control;
+            this.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(419, 322);
             this.Controls.Add(this.btnDateCalculator);
@@ -242,10 +242,10 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "MyClock";
-            this.TransparencyKey = System.Drawing.SystemColors.Control;
+            this.TransparencyKey = System.Drawing.SystemColors.ButtonFace;
             this.Load += new System.EventHandler(this.Form1_Load);
-            this.contextMenuStrip.ResumeLayout(false);
             this.cms_Lbl1.ResumeLayout(false);
+            this.contextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

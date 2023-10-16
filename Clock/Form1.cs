@@ -15,6 +15,14 @@ namespace Clock
     public partial class Form1 : Form
     {
         private string[] fonts;
+        private string fontDirectory;
+
+        public string FontDirectory
+
+        {
+            get { return fontDirectory; }
+            set { fontDirectory = value; }
+        }
 
         public string[] Fonts
         { 
@@ -31,13 +39,14 @@ namespace Clock
             );
             ControlsVisible(false);
             CreateCustomLabelFont();
+            SetFontDirectory();
         }
         void SetFontDirectory()
         {
             String currentDirectory = System.IO.Directory.GetCurrentDirectory();
             //MessageBox.Show(this, currentDirectory, "Current directory", MessageBoxButtons.OK);
             string[] currentDirectoryItems = currentDirectory.Split('\\');
-            Array.Resize(ref currentDirectoryItems, currentDirectoryItems.Length-2);
+            Array.Resize(ref currentDirectoryItems, currentDirectoryItems.Length-1);
             string newCurrentDirectory = "";
             foreach(string i in currentDirectoryItems)
             {
@@ -45,9 +54,10 @@ namespace Clock
                 newCurrentDirectory += "\\";
 
             }
-            newCurrentDirectory += "Fonts";
+            newCurrentDirectory += "Font";
             //MessageBox.Show(this, $"{currentDirectory}\n:{newCurrentDirectory}", "Current Directory", MessageBoxButtons.OK);
             Fonts = Directory.GetFiles(newCurrentDirectory);
+            FontDirectory = newCurrentDirectory;
         }
         void CreateCustomLabelFont()
         {
@@ -63,12 +73,17 @@ namespace Clock
         }
         private void timer1_Tick(object sender, EventArgs e)
         {
-            //label1.Text = DateTime.Now.ToString("HH:mm:ss \t");
-            label1.Text = DateTime.Now.ToString("HH:mm:ss tt"); // AM PM
-            if(cbShowDate.Checked)
-            {
-                label1.Text += DateTime.Now.ToString("dd:MM:yyyy");
-            }
+            //label1.PreferredWidth = 430;
+            //label1.PreferredHeight = 85;
+            //label1.Text = DateTime.Now.ToString("HH:mm:ss tt"); // AM PM
+           
+             label1.Text = DateTime.Now.ToString("HH:mm:ss \t");
+                if (cbShowDate.Checked)
+                {
+                    label1.Text += DateTime.Now.ToString("dd:MM:yyyy");
+                }
+          
+                //MessageBox.Show(this, error.Message);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -87,7 +102,7 @@ namespace Clock
         }
         private void ControlsVisible(bool visible)
         {
-            if (visible) this.FormBorderStyle = FormBorderStyle.None;
+            if (!visible) this.FormBorderStyle = FormBorderStyle.None;
             else this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.ShowInTaskbar = visible;
             cbShowDate.Visible = visible;
@@ -152,8 +167,11 @@ namespace Clock
 
         private void cms_Lbl1_ChItem_Click(object sender, EventArgs e)
         {
-            Form_ChooseFont fcf = new Form_ChooseFont();
-            fcf.Show(this);
+            Form_ChooseFont fcf = new Form_ChooseFont(label1.Font, FontDirectory);
+            fcf.ShowDialog(this);
+            label1.Font = fcf.OldFont;
+            FontDirectory = fcf.FontDirectory;
+            string str = fontDirectory;
         }
     }
 }
